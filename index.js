@@ -12,6 +12,7 @@ var pkg = require('./package.json');
 var web = require('./lib/web');
 var mailserver = require('./lib/mailserver');
 var logger = require('./lib/logger');
+var fs = require('fs');
 
 
 module.exports = function(config) {
@@ -37,6 +38,9 @@ module.exports = function(config) {
       .option('--web-ip <ip address>', 'IP Address to bind HTTP service to, defaults to --ip')
       .option('--web-user <user>', 'HTTP user for GUI')
       .option('--web-pass <password>', 'HTTP password for GUI')
+      .option('--web-secure-key <key>', 'Key file to use when HTTPS is enabled for GUI')
+      .option('--web-secure-cert <cert>', 'Certificate to use when HTTPS is enabled for GUI')
+      .option('--web-secure-ca <ca>', 'Custom CA chain to use when HTTPS is enabled for GUI')
       .option('--base-pathname <path>', 'base path for URLs')
       .option('-o, --open', 'Open the Web GUI after startup')
       .option('-v, --verbose')
@@ -74,7 +78,19 @@ module.exports = function(config) {
 
   // Default to run on same IP as smtp
   var webIp = config.webIp ? config.webIp : config.ip;
-  web.start(config.web, webIp, mailserver, config.webUser, config.webPass, config.basePathname);
+
+  var httpsOptions;
+  if (config.webSecureKey && config.webSecureCert) {
+    httpsOptions = {
+       key: fs.readFileSync(config.webSecureKey),
+       cert: fs.readFileSync(config.webSecureCert)
+    };
+    if (config.webSecureCa) {
+      httpsOptions.ca = fs.readFileSync(config.webSecureCa)
+    }
+  }
+
+  web.start(config.web, webIp, mailserver, config.webUser, config.webPass, config.basePathname, httpsOptions);
 
   if (config.open){
     var open = require('open');
