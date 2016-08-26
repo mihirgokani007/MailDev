@@ -43,6 +43,7 @@ For convenient use with Grunt, try [grunt-maildev](https://github.com/xavierprio
       --web-ip <ip address>         IP Address to bind HTTP service to, defaults to --ip
       --web-user <user>             HTTP basic auth username
       --web-pass <pass>             HTTP basic auth password
+      --save-to <dir>               Directory path for saving emails, defaults to a temp directory
       -o, --open                    Open the Web GUI after startup
       -v, --verbose
 
